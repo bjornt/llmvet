@@ -12,5 +12,5 @@ make test   # run Go tests
 make clean  # remove build artifacts
 ```
 
-`make build` works without first running `make web` — a placeholder
-`index.html` is embedded so the binary always compiles.
+`make build` runs `make web` first because `//go:embed` requires the vite
+output to exist at compile time.

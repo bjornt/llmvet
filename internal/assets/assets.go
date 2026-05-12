@@ -1,8 +1,9 @@
 // Package assets exposes the embedded frontend bundle.
 //
 // Vite writes its build output into ./dist (configured in web/vite.config.ts).
-// A placeholder dist/index.html is committed so `go build` works before the
-// frontend has been built.
+// The dist/ directory is not checked in, so `make web` (or any equivalent
+// vite build) must run before `go build` — otherwise //go:embed will fail
+// because its pattern matches no files.
 package assets
 
 import (

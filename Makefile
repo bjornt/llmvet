@@ -10,9 +10,10 @@ all: build
 web:
 	cd $(WEB_DIR) && npm install && npm run build
 
-# Compile the Go binary. Run `make web` first for a populated bundle; otherwise
-# the committed placeholder index.html ships in the binary.
-build:
+# Compile the Go binary. Depends on `web` because internal/assets embeds the
+# vite output via //go:embed, which fails at compile time if the dist/
+# directory is empty.
+build: web
 	go build -o $(BIN) ./cmd/llmreview
 
 test:
@@ -21,6 +22,4 @@ test:
 clean:
 	rm -rf bin
 	rm -rf $(WEB_DIR)/node_modules
-	# Wipe build artifacts; preserve the committed placeholder so `go build`
-	# keeps working on a fresh checkout.
-	find $(DIST_DIR) -mindepth 1 -not -name index.html -delete 2>/dev/null || true
+	rm -rf $(DIST_DIR)
