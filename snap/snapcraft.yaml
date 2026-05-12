@@ -16,6 +16,7 @@ apps:
   llmvet:
     command: bin/llmvet
     plugs:
+      - desktop
       - network
       - network-bind
       - home
