@@ -150,7 +150,7 @@ func parseFileBody(f *File, lines []string) (int, error) {
 	if old == "/dev/null" {
 		f.Status = StatusAdded
 	} else if f.Status != StatusRenamed && f.Status != StatusCopied {
-		f.OldPath = strings.TrimPrefix(old, "a/")
+		f.OldPath, _ = cutPrefix(old)
 	}
 	if len(lines) < 2 || !strings.HasPrefix(lines[1], "+++ ") {
 		return 0, fmt.Errorf("diff: expected +++ after ---")
@@ -159,7 +159,7 @@ func parseFileBody(f *File, lines []string) (int, error) {
 	if newp == "/dev/null" {
 		f.Status = StatusDeleted
 	} else if f.Status != StatusRenamed && f.Status != StatusCopied {
-		f.Path = strings.TrimPrefix(newp, "b/")
+		f.Path, _ = cutPrefix(newp)
 	}
 	normalizePaths(f)
 
@@ -240,23 +240,48 @@ func parseHunk(lines []string) (Hunk, int, error) {
 	return h, i, nil
 }
 
-// parseDiffHeader extracts the a/ and b/ paths from a `diff --git` line.
+// cutPrefix strips a single-letter path prefix like "a/" or "i/".
+func cutPrefix(s string) (string, bool) {
+	if len(s) >= 2 && s[1] == '/' {
+		return s[2:], true
+	}
+	return s, false
+}
+
+// secondPrefixIdx finds the space before the second path prefix in a
+// `diff --git` line. The second path is preceded by " x/" where x is any
+// lowercase letter, indepdent of mnemonicprefix.
+func secondPrefixIdx(s string) int {
+	for i := 0; i < len(s)-2; i++ {
+		if s[i] == ' ' && s[i+2] == '/' {
+			return i
+		}
+	}
+	return -1
+}
+
+// parseDiffHeader extracts the two paths from a `diff --git` line.
 // For paths containing " b/", we prefer the midpoint split (which is correct
 // when both paths are equal — the common case).
 func parseDiffHeader(line string) (string, string, bool) {
 	rest, ok := strings.CutPrefix(line, "diff --git ")
-	if !ok || !strings.HasPrefix(rest, "a/") {
+	if !ok {
+		return "", "", false
+	}
+	if _, ok := cutPrefix(rest); !ok {
 		return "", "", false
 	}
 	n := len(rest)
 	if (n-5)%2 == 0 {
 		mid := 2 + (n-5)/2
-		if mid < n && rest[mid] == ' ' && strings.HasPrefix(rest[mid+1:], "b/") {
-			return rest[2:mid], rest[mid+3:], true
+		if mid+2 < n && rest[mid] == ' ' {
+			if _, ok := cutPrefix(rest[mid+1:]); ok {
+				return rest[2:mid], rest[mid+3:], true
+			}
 		}
 	}
-	idx := strings.Index(rest, " b/")
-	if idx <= 2 {
+	idx := secondPrefixIdx(rest)
+	if idx < 2 {
 		return "", "", false
 	}
 	return rest[2:idx], rest[idx+3:], true

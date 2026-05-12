@@ -1,3 +1,104 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.diff-hunk {
+  width: 100%;
+}
+
+.diff-line {
+  line-height: 1.25rem;
+}
+
+.diff-gutter {
+  @apply select-none whitespace-nowrap px-2 text-right align-top text-[11px] leading-5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  width: 1%;
+}
+
+.diff-gutter-normal {
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.diff-gutter-insert {
+  @apply text-green-700 dark:text-green-300;
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.diff-gutter-delete {
+  @apply text-red-700 dark:text-red-300;
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.diff-code {
+  @apply whitespace-pre align-top text-[13px] leading-5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.diff-code-normal {
+  @apply text-slate-800 dark:text-slate-200;
+  background-color: transparent;
+}
+
+.diff-code-insert {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.diff-code-delete {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.token.keyword,
+.token.builtin,
+.token.boolean,
+.token.null,
+.token.undefined {
+  @apply text-purple-600 dark:text-purple-300;
+}
+
+.token.string,
+.token.char,
+.token.template-string {
+  @apply text-emerald-600 dark:text-emerald-300;
+}
+
+.token.number {
+  @apply text-amber-600 dark:text-amber-300;
+}
+
+.token.function,
+.token.maybe-class-name {
+  @apply text-blue-600 dark:text-blue-300;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  @apply text-slate-400 dark:text-slate-500;
+  font-style: italic;
+}
+
+.token.operator,
+.token.punctuation {
+  @apply text-slate-600 dark:text-slate-400;
+}
+
+.token.selector,
+.token.attr-name,
+.token.property {
+  @apply text-rose-600 dark:text-rose-300;
+}
+
+.token.regex,
+.token.important {
+  @apply text-orange-600 dark:text-orange-300;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
