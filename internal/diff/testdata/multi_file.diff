@@ -1,0 +1,14 @@
+diff --git a/a.txt b/a.txt
+index 1111111..2222222 100644
+--- a/a.txt
++++ b/a.txt
+@@ -1 +1 @@
+-old
++new
+diff --git a/b.txt b/b.txt
+new file mode 100644
+index 0000000..3333333
+--- /dev/null
++++ b/b.txt
+@@ -0,0 +1 @@
++brand new
