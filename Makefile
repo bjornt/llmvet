@@ -1,4 +1,4 @@
-.PHONY: all web build test clean
+.PHONY: all web build test check clean
 
 BIN      := bin/llmvet
 WEB_DIR  := web
@@ -17,6 +17,10 @@ build: web
 	go build -o $(BIN) ./cmd/llmvet
 
 test:
+	go test ./...
+
+check:
+	go vet ./...
 	go test ./...
 
 clean:
