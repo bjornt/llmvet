@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Diff } from '../types';
 import { fetchDiff } from '../api';
 
@@ -7,21 +7,21 @@ export function useDiff(staged: boolean) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pollInterval, setPollInterval] = useState<number>(2000);
+  const stoppedRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
       const data = await fetchDiff(staged);
+      if (stoppedRef.current) return;
       setDiff(data);
       setError(null);
       setLoading(false);
     } catch (err: unknown) {
-      if (err instanceof TypeError && pollInterval > 0) {
-        return;
-      }
+      if (stoppedRef.current) return;
       setError(err instanceof Error ? err.message : 'unknown error');
       setLoading(false);
     }
-  }, [staged, pollInterval]);
+  }, [staged]);
 
   useEffect(() => {
     if (pollInterval <= 0) return;
@@ -35,6 +35,7 @@ export function useDiff(staged: boolean) {
   }, [load]);
 
   const stopPolling = useCallback(() => {
+    stoppedRef.current = true;
     setPollInterval(0);
   }, []);
 

@@ -6,9 +6,10 @@ interface FileListProps {
   files: File[];
   activePath: string | null;
   onFileClick: (path: string) => void;
+  commentCounts: Record<string, number>;
 }
 
-function FileItem({ file, active, onHover }: { file: File; active: boolean; onHover: () => void }) {
+function FileItem({ file, active, onHover, commentCount }: { file: File; active: boolean; onHover: () => void; commentCount: number }) {
   const { adds, dels } = addDelCounts(file);
   const isBinary = file.binary;
 
@@ -27,6 +28,9 @@ function FileItem({ file, active, onHover }: { file: File; active: boolean; onHo
           {isBinary && (
             <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500">bin</span>
           )}
+          {commentCount > 0 && (
+            <span className="text-blue-600 dark:text-blue-400 tabular-nums">{commentCount}&#65121;</span>
+          )}
           {adds > 0 && (
             <span className="text-green-600 dark:text-green-400 tabular-nums">+{adds}</span>
           )}
@@ -39,7 +43,7 @@ function FileItem({ file, active, onHover }: { file: File; active: boolean; onHo
   );
 }
 
-export default function FileList({ files, activePath, onFileClick }: FileListProps) {
+export default function FileList({ files, activePath, onFileClick, commentCounts }: FileListProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -65,6 +69,7 @@ export default function FileList({ files, activePath, onFileClick }: FileListPro
               file={file}
               active={file.path === activePath}
               onHover={() => onFileClick(file.path)}
+              commentCount={commentCounts[file.path] || 0}
             />
           ))}
         </div>

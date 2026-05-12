@@ -25,3 +25,22 @@ export interface Line {
   new: number | null;
   content: string;
 }
+
+export interface ReviewComment {
+  localId: string;
+  file: string;
+  changeKey: string;
+  line: number;
+  side: 'old' | 'new';
+  body: string;
+}
+
+export type ReviewState = 'idle' | 'submitting' | 'submitted' | 'approving' | 'approved';
+
+export interface ComposerState {
+  file: string;
+  changeKey: string;
+  line: number;
+  side: 'old' | 'new';
+  editCommentId?: string;
+}
