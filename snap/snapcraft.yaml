@@ -30,7 +30,7 @@ parts:
     build-packages:
       - git
       - make
-    stage-snaps:
+    stage-packages:
       - git
     override-build: |
       base_version="$(sed -n 's/^var Version = "\(.*\)"/\1/p' "${SNAPCRAFT_PART_SRC}/cmd/llmvet/main.go")"
