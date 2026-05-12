@@ -1,4 +1,4 @@
-# llmreview
+# llmvet
 
 Local code-review tool for LLM/agent harnesses. See [SPEC.md](SPEC.md) for the
 design and [PLAN.md](PLAN.md) for the implementation plan.
@@ -7,7 +7,7 @@ design and [PLAN.md](PLAN.md) for the implementation plan.
 
 ```
 make web    # build the frontend bundle (writes internal/assets/dist/)
-make build  # compile bin/llmreview with the bundle embedded
+make build  # compile bin/llmvet with the bundle embedded
 make test   # run Go tests
 make clean  # remove build artifacts
 ```

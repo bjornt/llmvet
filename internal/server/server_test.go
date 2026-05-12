@@ -12,7 +12,7 @@ import (
 	"testing/fstest"
 	"time"
 
-	"llmreview/internal/diff"
+	"llmvet/internal/diff"
 )
 
 // fakeAssets is a minimal embedded-FS stand-in: an index.html so "/" works in

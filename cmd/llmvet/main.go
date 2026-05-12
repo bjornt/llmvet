@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"syscall"
 
-	"llmreview/internal/assets"
-	"llmreview/internal/diff"
-	"llmreview/internal/server"
+	"llmvet/internal/assets"
+	"llmvet/internal/diff"
+	"llmvet/internal/server"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func run(port int, noOpen bool) int {
 	srv := server.New(diff.Run, assets.FS())
 	addr := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	if err := srv.Listen(addr); err != nil {
-		fmt.Fprintf(os.Stderr, "llmreview: bind %s: %v\n", addr, err)
+		fmt.Fprintf(os.Stderr, "llmvet: bind %s: %v\n", addr, err)
 		return 1
 	}
 

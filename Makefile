@@ -1,6 +1,6 @@
 .PHONY: all web build test clean
 
-BIN      := bin/llmreview
+BIN      := bin/llmvet
 WEB_DIR  := web
 DIST_DIR := internal/assets/dist
 
@@ -14,7 +14,7 @@ web:
 # vite output via //go:embed, which fails at compile time if the dist/
 # directory is empty.
 build: web
-	go build -o $(BIN) ./cmd/llmreview
+	go build -o $(BIN) ./cmd/llmvet
 
 test:
 	go test ./...

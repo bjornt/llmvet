@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"llmreview/internal/diff"
+	"llmvet/internal/diff"
 )
 
 // Action is what triggered the server to shut down.
@@ -203,7 +203,7 @@ const approvedHTML = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>llmreview — approved</title>
+<title>llmvet — approved</title>
 <style>
   body { font-family: system-ui, sans-serif; display: grid; place-items: center;
          min-height: 100vh; margin: 0; background: #f7f7f8; color: #222; }
