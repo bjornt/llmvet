@@ -15,10 +15,18 @@ import (
 	"llmvet/internal/server"
 )
 
+var Version = "0.1.0"
+
 func main() {
 	port := flag.Int("port", 0, "TCP port to bind on 127.0.0.1 (0 = random free port)")
 	noOpen := flag.Bool("no-open", false, "do not open the browser automatically")
+	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(Version)
+		return
+	}
 
 	os.Exit(run(*port, *noOpen))
 }

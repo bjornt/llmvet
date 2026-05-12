@@ -1,0 +1,46 @@
+name: llmvet
+summary: Local code-review tool for LLM/agent harnesses
+description: |
+  llmvet is a local code-review tool for LLM/agent harnesses. An agent
+  invokes it after making changes; a human reviews the diff in a browser,
+  leaves inline comments, and either submits the review (returning comments
+  as a prompt for the agent) or approves without changes.
+adopt-info: llmvet
+base: core24
+license: Apache-2.0
+
+grade: stable
+confinement: strict
+
+apps:
+  llmvet:
+    command: bin/llmvet
+    plugs:
+      - network
+      - network-bind
+      - home
+
+parts:
+  llmvet:
+    plugin: nil
+    source: .
+    build-snaps:
+      - go
+      - node/22/stable
+    build-packages:
+      - git
+      - make
+    stage-snaps:
+      - git
+    override-build: |
+      base_version="$(sed -n 's/^var Version = "\(.*\)"/\1/p' "${SNAPCRAFT_PART_SRC}/cmd/llmvet/main.go")"
+      commit_index="$(git rev-list --count HEAD)"
+      short_hash="$(git rev-parse --short HEAD)"
+      version="${base_version}-${commit_index}-g${short_hash}"
+      craftctl set version="${version}"
+      make build LDFLAGS="-X main.Version=${version}"
+      install -D -m755 bin/llmvet "${SNAPCRAFT_PART_INSTALL}/bin/llmvet"
+      mkdir -p "${SNAPCRAFT_PART_INSTALL}/share/llmvet/opencode-commands"
+      mkdir -p "${SNAPCRAFT_PART_INSTALL}/share/llmvet/agent-skills"
+      cp .opencode/commands/llmvet.md "${SNAPCRAFT_PART_INSTALL}/share/llmvet/opencode-commands/"
+      cp -r .claude/skills/llmvet "${SNAPCRAFT_PART_INSTALL}/share/llmvet/agent-skills/"

@@ -8,3 +8,9 @@
 # Vite writes its build output here; nothing in this directory is checked in.
 # Run `make web` before `go build` so //go:embed has files to embed.
 /internal/assets/dist/
+
+# snapcraft
+/parts/
+/stage/
+/prime/
+*.snap
