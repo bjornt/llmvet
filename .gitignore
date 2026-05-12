@@ -1,0 +1,11 @@
+/bin/
+/web/node_modules/
+/web/dist/
+/web/*.tsbuildinfo
+/web/vite.config.js
+/web/vite.config.d.ts
+
+# Vite writes its build output here. The placeholder index.html is committed
+# so `go build` works on a fresh checkout; everything else is generated.
+/internal/assets/dist/*
+!/internal/assets/dist/index.html
