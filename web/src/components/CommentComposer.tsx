@@ -30,7 +30,7 @@ export default function CommentComposer({ initialBody = '', onSave, onCancel }: 
           value={body}
           onChange={(e) => setBody(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Write a comment\u2026"
+          placeholder="Write a comment…"
           rows={2}
           className="w-full resize-none rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-blue-500"
         />

@@ -59,7 +59,7 @@ export default function FileDiff({
         if (!lineComments && !isComposing) continue;
 
         w[key] = (
-          <div className="border-t border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-900">
+          <div className="max-w-[100ch] border-t border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-900">
             {lineComments?.map((c) => (
               <div key={c.localId} className="border-b border-slate-100 px-4 py-2 last:border-b-0 dark:border-slate-700">
                 <div className="flex items-start justify-between gap-2">
