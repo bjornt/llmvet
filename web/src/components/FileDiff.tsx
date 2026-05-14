@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { Diff, Hunk, getChangeKey, computeOldLineNumber, computeNewLineNumber } from 'react-diff-view';
 import type { HunkData, ChangeData, RenderGutter } from 'react-diff-view';
 import type { File, ReviewComment, ComposerState } from '../types';
@@ -126,17 +126,19 @@ export default function FileDiff({
       const defaultContent = renderDefault();
       const startComment = () => onStartComposer(file.path, getChangeKey(change), commentLine, commentSide);
 
+      const showButton = inHoverState && hasLine && side === 'new';
+
       return wrapInAnchor(
         <span
-          className={'relative flex items-center px-2 w-full' + (hasLine ? ' cursor-pointer' : '')}
+          className={'relative flex items-center px-2 w-full min-h-[1.25rem]' + (hasLine ? ' cursor-pointer' : '')}
           onClick={hasLine ? startComment : undefined}
           role={hasLine ? 'button' : undefined}
           tabIndex={hasLine ? 0 : undefined}
           onKeyDown={hasLine ? (e) => { if (e.key === 'Enter') startComment(); } : undefined}>
-          {inHoverState && hasLine && (
+          {showButton && (
             <button
               onClick={(e) => { e.stopPropagation(); startComment(); }}
-              className="absolute left-0 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer"
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer z-10"
               title="Add comment"
             >
               +
@@ -150,6 +152,36 @@ export default function FileDiff({
     },
     [file.path, onStartComposer],
   );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const onStartComposerRef = useRef(onStartComposer);
+  onStartComposerRef.current = onStartComposer;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handler = (e: MouseEvent) => {
+      const cell = (e.target as HTMLElement).closest('.diff-gutter-omit, .diff-code-omit');
+      if (!cell) return;
+
+      const row = (cell as HTMLElement).closest('tr');
+      if (!row) return;
+
+      const keyCell = row.querySelector<HTMLElement>('[data-change-key]');
+      if (!keyCell?.dataset.changeKey) return;
+
+      const cells = Array.from(row.children);
+      const side: 'old' | 'new' = cells.indexOf(keyCell) < 2 ? 'old' : 'new';
+      const lineText = keyCell.textContent?.trim();
+      const line = lineText ? parseInt(lineText, 10) : 0;
+
+      onStartComposerRef.current(file.path, keyCell.dataset.changeKey, line, side);
+    };
+
+    container.addEventListener('click', handler);
+    return () => container.removeEventListener('click', handler);
+  }, [file.path]);
 
   if (file.binary) {
     return (
@@ -173,7 +205,7 @@ export default function FileDiff({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div ref={containerRef} className="overflow-x-auto">
       <Diff
         hunks={hunks}
         diffType={diffType}
