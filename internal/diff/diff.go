@@ -11,8 +11,9 @@ import (
 
 // Diff is the top-level response shape returned by /api/diff.
 type Diff struct {
-	Staged bool   `json:"staged"`
-	Files  []File `json:"files"`
+	Staged    bool   `json:"staged"`
+	Files     []File `json:"files"`
+	Untracked []string `json:"untracked,omitempty"`
 }
 
 // File describes a single file changed by the diff.

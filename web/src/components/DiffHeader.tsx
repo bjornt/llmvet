@@ -8,8 +8,11 @@ interface DiffHeaderProps {
   delCount: number;
   commentCount: number;
   reviewState: ReviewState;
+  hideUntracked: boolean;
+  untrackedCount: number;
   onStagedChange: (staged: boolean) => void;
   onViewTypeChange: (viewType: 'unified' | 'split') => void;
+  onHideUntrackedChange: (hide: boolean) => void;
   onSubmitReview: () => void;
   onApprove: () => void;
 }
@@ -22,8 +25,11 @@ export default function DiffHeader({
   delCount,
   commentCount,
   reviewState,
+  hideUntracked,
+  untrackedCount,
   onStagedChange,
   onViewTypeChange,
+  onHideUntrackedChange,
   onSubmitReview,
   onApprove,
 }: DiffHeaderProps) {
@@ -58,6 +64,17 @@ export default function DiffHeader({
               Unstaged
             </button>
           </div>
+          {!staged && untrackedCount > 0 && (
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={hideUntracked}
+                onChange={(e) => onHideUntrackedChange(e.target.checked)}
+                className="rounded border-slate-300 text-blue-500 focus:ring-blue-400 dark:border-slate-600"
+              />
+              hide untracked ({untrackedCount})
+            </label>
+          )}
         </div>
 
         <div className="flex items-center gap-4">

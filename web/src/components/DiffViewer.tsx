@@ -11,10 +11,23 @@ import FileDiff from './FileDiff';
 export default function DiffViewer() {
   const [stagedStr, setStaged] = useQueryParam('staged', 'false');
   const [viewType, setViewType] = useQueryParam('view', 'unified');
+  const [hideUntrackedStr, setHideUntracked] = useQueryParam('hide_untracked', 'false');
   const staged = stagedStr === 'true';
   const resolvedViewType = viewType === 'split' ? 'split' : 'unified';
+  const hideUntracked = hideUntrackedStr === 'true';
 
   const { diff, loading, error, stopPolling } = useDiff(staged);
+
+  const untrackedSet = useMemo(() => new Set(diff?.untracked ?? []), [diff]);
+  const untrackedCount = untrackedSet.size;
+
+  const visibleFiles = useMemo(() => {
+    if (!diff) return [];
+    if (!hideUntracked || !diff.untracked) return diff.files;
+    const hide = new Set(diff.untracked);
+    return diff.files.filter((f) => !hide.has(f.path));
+  }, [diff, hideUntracked]);
+
   const fileRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const [activePath, setActivePath] = useQueryParam('file', '');
 
@@ -23,16 +36,17 @@ export default function DiffViewer() {
   const [reviewState, setReviewState] = useState<ReviewState>('idle');
 
   const { fileCount, addCount, delCount } = useMemo(() => {
-    if (!diff) return { fileCount: 0, addCount: 0, delCount: 0 };
+    const files = visibleFiles;
+    if (files.length === 0) return { fileCount: 0, addCount: 0, delCount: 0 };
     let adds = 0;
     let dels = 0;
-    for (const file of diff.files) {
+    for (const file of files) {
       const c = addDelCounts(file);
       adds += c.adds;
       dels += c.dels;
     }
-    return { fileCount: diff.files.length, addCount: adds, delCount: dels };
-  }, [diff]);
+    return { fileCount: files.length, addCount: adds, delCount: dels };
+  }, [visibleFiles]);
 
   const scrollToFile = useCallback((path: string) => {
     const el = fileRefs.current.get(path);
@@ -160,7 +174,7 @@ export default function DiffViewer() {
     );
   }
 
-  if (!diff || diff.files.length === 0) {
+  if (!diff || visibleFiles.length === 0) {
     return (
       <div className="flex min-h-screen flex-col">
         <DiffHeader
@@ -171,8 +185,11 @@ export default function DiffViewer() {
           delCount={0}
           commentCount={0}
           reviewState={reviewState}
+          hideUntracked={hideUntracked}
+          untrackedCount={untrackedCount}
           onStagedChange={(s) => setStaged(String(s))}
           onViewTypeChange={setViewType}
+          onHideUntrackedChange={(v) => setHideUntracked(String(v))}
           onSubmitReview={handleSubmitReview}
           onApprove={handleApprove}
         />
@@ -195,20 +212,23 @@ export default function DiffViewer() {
         delCount={delCount}
         commentCount={commentCount}
         reviewState={reviewState}
+        hideUntracked={hideUntracked}
+        untrackedCount={untrackedCount}
         onStagedChange={(s) => setStaged(String(s))}
         onViewTypeChange={setViewType}
+        onHideUntrackedChange={(v) => setHideUntracked(String(v))}
         onSubmitReview={handleSubmitReview}
         onApprove={handleApprove}
       />
       <div className="flex flex-1">
         <FileList
-          files={diff.files}
+          files={visibleFiles}
           activePath={activePath || null}
           onFileClick={scrollToFile}
           commentCounts={commentCountsByFile}
         />
         <main className="flex-1">
-          {diff.files.map((file) => (
+          {visibleFiles.map((file) => (
             <div
               key={file.path}
               ref={(el) => setFileRef(file.path, el)}

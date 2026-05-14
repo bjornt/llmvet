@@ -1,6 +1,7 @@
 export interface Diff {
   staged: boolean;
   files: File[];
+  untracked?: string[];
 }
 
 export interface File {
