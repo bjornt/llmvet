@@ -114,22 +114,35 @@ export default function FileDiff({
 
   const renderGutter: RenderGutter = useCallback(
     ({ change, side, inHoverState, renderDefault, wrapInAnchor }) => {
-      const lineNumber = side === 'old' ? computeOldLineNumber(change) : computeNewLineNumber(change);
-      const canComment = lineNumber !== -1;
+      const oldLine = computeOldLineNumber(change);
+      const newLine = computeNewLineNumber(change);
+      const hasLine = oldLine !== -1 || newLine !== -1;
+      const currentLine = side === 'old' ? oldLine : newLine;
+      const hasCurrentLine = currentLine !== -1;
+
+      const commentLine = hasCurrentLine ? currentLine : (oldLine !== -1 ? oldLine : newLine);
+      const commentSide = hasCurrentLine ? (side as 'old' | 'new') : (oldLine !== -1 ? 'old' : 'new');
+
       const defaultContent = renderDefault();
+      const startComment = () => onStartComposer(file.path, getChangeKey(change), commentLine, commentSide);
 
       return wrapInAnchor(
-        <span className="inline-flex items-center gap-0.5">
-          {inHoverState && canComment && (
+        <span
+          className={'flex items-center gap-0.5 px-2 w-full' + (hasLine ? ' cursor-pointer' : '')}
+          onClick={hasLine ? startComment : undefined}
+          role={hasLine ? 'button' : undefined}
+          tabIndex={hasLine ? 0 : undefined}
+          onKeyDown={hasLine ? (e) => { if (e.key === 'Enter') startComment(); } : undefined}>
+          {inHoverState && hasLine && (
             <button
-              onClick={() => onStartComposer(file.path, getChangeKey(change), lineNumber, side as 'old' | 'new')}
-              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); startComment(); }}
+              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer shrink-0"
               title="Add comment"
             >
               +
             </button>
           )}
-          <span className={inHoverState && canComment ? 'opacity-50' : ''}>
+          <span className={inHoverState && hasCurrentLine ? 'opacity-50' : ''}>
             {defaultContent}
           </span>
         </span>,

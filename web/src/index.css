@@ -11,7 +11,7 @@
 }
 
 .diff-gutter {
-  @apply select-none whitespace-nowrap px-2 text-right align-top text-[11px] leading-5;
+  @apply select-none whitespace-nowrap text-right align-top text-[11px] leading-5;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   width: 1%;
 }
