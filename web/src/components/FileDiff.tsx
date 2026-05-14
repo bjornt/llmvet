@@ -128,7 +128,7 @@ export default function FileDiff({
 
       return wrapInAnchor(
         <span
-          className={'flex items-center gap-0.5 px-2 w-full' + (hasLine ? ' cursor-pointer' : '')}
+          className={'relative flex items-center px-2 w-full' + (hasLine ? ' cursor-pointer' : '')}
           onClick={hasLine ? startComment : undefined}
           role={hasLine ? 'button' : undefined}
           tabIndex={hasLine ? 0 : undefined}
@@ -136,13 +136,13 @@ export default function FileDiff({
           {inHoverState && hasLine && (
             <button
               onClick={(e) => { e.stopPropagation(); startComment(); }}
-              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer shrink-0"
+              className="absolute left-0 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer"
               title="Add comment"
             >
               +
             </button>
           )}
-          <span className={inHoverState && hasCurrentLine ? 'opacity-50' : ''}>
+          <span className={'pl-3' + (inHoverState && hasCurrentLine ? ' opacity-50' : '')}>
             {defaultContent}
           </span>
         </span>,
