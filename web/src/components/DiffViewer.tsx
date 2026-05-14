@@ -161,7 +161,7 @@ export default function DiffViewer() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-sm text-slate-400 dark:text-slate-500">Loading diff...</div>
+        <div className="text-sm text-slate-500 dark:text-slate-400">Loading diff...</div>
       </div>
     );
   }
@@ -169,7 +169,7 @@ export default function DiffViewer() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-sm text-red-500">Error: {error}</div>
+        <div className="text-sm text-red-600 dark:text-red-400">Error: {error}</div>
       </div>
     );
   }
@@ -194,7 +194,7 @@ export default function DiffViewer() {
           onApprove={handleApprove}
         />
         <div className="flex flex-1 items-center justify-center">
-          <div className="text-sm text-slate-400 dark:text-slate-500">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
             No changes detected
           </div>
         </div>

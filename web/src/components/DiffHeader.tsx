@@ -89,7 +89,7 @@ export default function DiffHeader({
             {' '}
             <span className="font-medium text-red-600 dark:text-red-400">-{delCount}</span>
             {' '}
-            <span className="text-slate-400 dark:text-slate-500">
+            <span className="text-slate-500 dark:text-slate-400">
               in {fileCount} file{fileCount !== 1 ? 's' : ''}
             </span>
           </span>
@@ -98,7 +98,7 @@ export default function DiffHeader({
             <button
               onClick={onSubmitReview}
               disabled={commentCount === 0 || isBusy}
-              className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {reviewState === 'submitting' ? 'Submitting\u2026' : 'Submit Review'}
             </button>

@@ -72,14 +72,14 @@ export default function FileDiff({
                   <div className="flex shrink-0 gap-1">
                     <button
                       onClick={() => onStartEdit(c)}
-                      className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                       className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
                       title="Edit"
                     >
                       &#9998;
                     </button>
                     <button
                       onClick={() => onDeleteComment(c.localId)}
-                      className="text-xs text-slate-400 hover:text-red-500"
+                       className="text-xs text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400"
                       title="Delete"
                     >
                       &#10005;
@@ -138,7 +138,7 @@ export default function FileDiff({
           {showButton && (
             <button
               onClick={(e) => { e.stopPropagation(); startComment(); }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer z-10"
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold leading-none cursor-pointer z-10"
               title="Add comment"
             >
               +
@@ -185,7 +185,7 @@ export default function FileDiff({
 
   if (file.binary) {
     return (
-      <div className="px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+      <div className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
         Binary file: <span className="font-mono">{file.path}</span>
       </div>
     );
@@ -198,7 +198,7 @@ export default function FileDiff({
         : file.path;
 
     return (
-      <div className="px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+      <div className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
         {label} — no changes
       </div>
     );

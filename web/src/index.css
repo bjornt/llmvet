@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100;
+  }
+}
+
 .diff-hunk {
   width: 100%;
 }
@@ -21,12 +27,12 @@
 }
 
 .diff-gutter-insert {
-  @apply text-green-700 dark:text-green-300;
+  @apply text-green-800;
   background-color: rgba(34, 197, 94, 0.08);
 }
 
 .diff-gutter-delete {
-  @apply text-red-700 dark:text-red-300;
+  @apply text-red-700;
   background-color: rgba(239, 68, 68, 0.08);
 }
 
@@ -37,7 +43,6 @@
 
 .diff-code-normal {
   @apply text-slate-800 dark:text-slate-200;
-  background-color: transparent;
 }
 
 .diff-code-insert {
@@ -46,6 +51,36 @@
 
 .diff-code-delete {
   background-color: rgba(239, 68, 68, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .diff-gutter-normal {
+    background-color: rgb(30 41 59);
+  }
+
+  .diff-code-normal {
+    background-color: rgb(30 41 59);
+  }
+
+  .diff-code-insert {
+    background-color: rgb(20 40 26);
+    color: rgb(226 232 240);
+  }
+
+  .diff-code-delete {
+    background-color: rgb(40 20 22);
+    color: rgb(226 232 240);
+  }
+
+  .diff-gutter-insert {
+    background-color: rgb(18 36 23);
+    color: rgb(100 180 120);
+  }
+
+  .diff-gutter-delete {
+    background-color: rgb(36 18 20);
+    color: rgb(200 100 105);
+  }
 }
 
 .token.keyword,
@@ -59,11 +94,11 @@
 .token.string,
 .token.char,
 .token.template-string {
-  @apply text-emerald-600 dark:text-emerald-300;
+  @apply text-emerald-700 dark:text-emerald-300;
 }
 
 .token.number {
-  @apply text-amber-600 dark:text-amber-300;
+  @apply text-amber-700 dark:text-amber-300;
 }
 
 .token.function,
@@ -75,7 +110,7 @@
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  @apply text-slate-400 dark:text-slate-500;
+  @apply text-slate-500 dark:text-slate-400;
   font-style: italic;
 }
 

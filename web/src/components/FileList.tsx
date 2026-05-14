@@ -18,15 +18,15 @@ function FileItem({ file, active, onHover, commentCount }: { file: File; active:
       onClick={() => onHover()}
       className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
         active
-          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-          : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/50'
+          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+          : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
       }`}
     >
       <div className="flex items-center gap-2">
         <span className="truncate flex-1 font-mono">{file.path}</span>
         <div className="flex items-center gap-1.5 shrink-0">
           {isBinary && (
-            <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500">bin</span>
+            <span className="text-[10px] uppercase text-slate-500 dark:text-slate-400">bin</span>
           )}
           {commentCount > 0 && (
             <span className="text-blue-600 dark:text-blue-400 tabular-nums">{commentCount}&#65121;</span>
@@ -47,10 +47,10 @@ export default function FileList({ files, activePath, onFileClick, commentCounts
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside className="w-64 shrink-0 border-r border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
+    <aside className="w-64 shrink-0 border-r border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex w-full items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+        className="flex w-full items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-200 dark:hover:text-slate-100"
       >
         <svg
           className={`h-3 w-3 transition-transform ${collapsed ? '' : 'rotate-90'}`}
