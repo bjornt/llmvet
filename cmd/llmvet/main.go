@@ -15,7 +15,7 @@ import (
 	"llmvet/internal/server"
 )
 
-var Version = "0.1.0"
+var Version = "0.2.0"
 
 func main() {
 	port := flag.Int("port", 0, "TCP port to bind on 127.0.0.1 (0 = random free port)")
