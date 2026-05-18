@@ -9,10 +9,13 @@ llmvet is a local code-review tool. After changes are made, it serves the diff a
 
 ## Workflow
 
-1. Run `llmvet` — this blocks until the review finishes. It opens a browser tab with the diff.
-2. After the review:
+1. Run `llmvet` directly — assume it is already on the PATH. If the command fails, print the error and stop. Do not search for the binary.
+2. This starts a local web server, opens the browser, and **blocks** until the human reviewer either submits comments or approves the diff.
+3. After the review:
    - **Stdout non-empty**: the reviewer left comments. Each block has the format:
      ```
+     The reviewer left the following comments on your changes. Address each one, then re-run the review.
+
      <file>:<line> (<side>)
      > <comment body>
      ```
@@ -21,4 +24,5 @@ llmvet is a local code-review tool. After changes are made, it serves the diff a
 
 ## When to use me
 
-Use this when the user wants to review changes — for example when they say "review the changes", "llmvet the changes", or "run llmvet", or in any other way implies that llmvet should be run. Do not use this for non-review tasks.
+  * When the user explicitly triggers this skill (e.g., via /llmvet).
+  * When the user asks to "review changes," "run llmvet," or requests a human-in-the-loop review. Do not use this skill for non-review tasks.
