@@ -1,0 +1,14 @@
+name: lp-git-mirror
+
+on: [push]
+
+jobs:
+  lp-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4509dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - run: git push --mirror https://${{ secrets.LPUSER }}:${{ secrets.LPACCESSTOKEN }}@git.launchpad.net/llmvet
