@@ -11,7 +11,10 @@
 // The split exists because Claude Code currently does not surface MCP
 // progress notifications (see anthropics/claude-code#51713), so the only way
 // to get the review URL in front of the user is to return it as the result
-// of a regular, non-blocking tool call.
+// of a regular, non-blocking tool call. wait_for_review also emits a
+// `notifications/progress` message carrying the URL when the client supplied
+// a progressToken, so harnesses that do surface progress will display it
+// during the wait.
 package mcp
 
 import (
@@ -105,6 +108,23 @@ type toolDef struct {
 type toolCallParams struct {
 	Name      string         `json:"name"`
 	Arguments map[string]any `json:"arguments,omitempty"`
+	Meta      *callMeta      `json:"_meta,omitempty"`
+}
+
+type callMeta struct {
+	ProgressToken json.RawMessage `json:"progressToken,omitempty"`
+}
+
+type progressParams struct {
+	ProgressToken json.RawMessage `json:"progressToken"`
+	Progress      float64         `json:"progress"`
+	Message       string          `json:"message,omitempty"`
+}
+
+type jsonrpcNotification struct {
+	JSONRPC string `json:"jsonrpc"`
+	Method  string `json:"method"`
+	Params  any    `json:"params,omitempty"`
 }
 
 type toolCallResult struct {
@@ -170,12 +190,16 @@ func (s *mcpServer) handle(ctx context.Context, req *jsonrpcRequest) error {
 				return nil
 			}
 		}
+		var progressToken json.RawMessage
+		if params.Meta != nil {
+			progressToken = params.Meta.ProgressToken
+		}
 		var result toolCallResult
 		switch params.Name {
 		case "start_review":
 			result = s.startReview(ctx)
 		case "wait_for_review":
-			result = s.waitForReview(ctx)
+			result = s.waitForReview(ctx, progressToken)
 		default:
 			s.sendError(req.ID, -32602, fmt.Sprintf("unknown tool: %s", params.Name))
 			return nil
@@ -272,8 +296,10 @@ func (s *mcpServer) startReview(parentCtx context.Context) toolCallResult {
 }
 
 // waitForReview blocks on the most recently started review and returns the
-// formatted result.
-func (s *mcpServer) waitForReview(ctx context.Context) toolCallResult {
+// formatted result. If progressToken is non-empty, a notifications/progress
+// message carrying the review URL is emitted before blocking, so harnesses
+// that surface progress notifications can show it during the wait.
+func (s *mcpServer) waitForReview(ctx context.Context, progressToken json.RawMessage) toolCallResult {
 	s.mu.Lock()
 	p := s.pending
 	s.mu.Unlock()
@@ -283,6 +309,14 @@ func (s *mcpServer) waitForReview(ctx context.Context) toolCallResult {
 			Content: []contentBlock{{Type: "text", Text: "No code review in progress. Call `start_review` first."}},
 			IsError: true,
 		}
+	}
+
+	if len(progressToken) > 0 {
+		s.sendNotification("notifications/progress", progressParams{
+			ProgressToken: progressToken,
+			Progress:      0,
+			Message:       fmt.Sprintf("Review server at %s", p.url),
+		})
 	}
 
 	var result server.Result
@@ -322,6 +356,16 @@ func (s *mcpServer) sendResult(id json.RawMessage, result any) {
 		JSONRPC: "2.0",
 		ID:      id,
 		Result:  result,
+	})
+}
+
+func (s *mcpServer) sendNotification(method string, params any) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_ = s.enc.Encode(jsonrpcNotification{
+		JSONRPC: "2.0",
+		Method:  method,
+		Params:  params,
 	})
 }
 
