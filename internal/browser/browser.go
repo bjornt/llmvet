@@ -1,14 +1,15 @@
-package main
+// Package browser launches the platform-specific URL handler.
+package browser
 
 import (
 	"os/exec"
 	"runtime"
 )
 
-// openBrowser launches the platform-specific URL handler. Failures are
-// silently ignored: the URL is also printed to stderr so the user can open
-// it themselves.
-func openBrowser(url string) {
+// Open launches the platform-specific URL handler. Failures are silently
+// ignored: callers should also surface the URL so the user can open it
+// themselves if needed.
+func Open(url string) {
 	var cmd string
 	var args []string
 	switch runtime.GOOS {

@@ -11,13 +11,26 @@ import (
 	"syscall"
 
 	"llmvet/internal/assets"
+	"llmvet/internal/browser"
 	"llmvet/internal/diff"
+	"llmvet/internal/mcp"
 	"llmvet/internal/server"
 )
 
 var Version = "0.2.0"
 
 func main() {
+	// Subcommand: llmvet mcp — run as MCP stdio server
+	if len(os.Args) > 1 && os.Args[1] == "mcp" {
+		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer stop()
+		if err := mcp.Run(ctx, Version); err != nil {
+			fmt.Fprintf(os.Stderr, "llmvet mcp: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	port := flag.Int("port", 0, "TCP port to bind on 127.0.0.1 (0 = random free port)")
 	noOpen := flag.Bool("no-open", false, "do not open the browser automatically")
 	showVersion := flag.Bool("version", false, "print version and exit")
@@ -42,7 +55,7 @@ func run(port int, noOpen bool) int {
 	url := srv.URL()
 	fmt.Fprintf(os.Stderr, "Open %s to review\n", url)
 	if !noOpen {
-		openBrowser(url)
+		browser.Open(url)
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

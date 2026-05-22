@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "llmvet": {
+      "command": "llmvet",
+      "args": ["mcp"]
+    }
+  }
+}
