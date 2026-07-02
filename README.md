@@ -58,3 +58,41 @@ make clean  # remove build artifacts
 
 `make build` runs `make web` first because `//go:embed` requires the vite
 output to exist at compile time.
+
+## Releases
+
+Releases are cut from a version tag and published automatically by the
+`release` GitHub Actions workflow (`.github/workflows/release.yml`).
+
+To release:
+
+1. Bump `var Version` in `cmd/llmvet/main.go` and merge to `main`.
+2. Tag the commit and push the tag:
+
+   ```
+   git tag v0.2.0        # must match var Version
+   git push origin v0.2.0
+   ```
+
+Pushing the tag mirrors the repo to Launchpad, which builds the snap and
+publishes it to the Snap Store for every architecture. The `release` workflow
+then waits for that store build, downloads each architecture's snap, verifies
+its `sha3-384`, extracts `bin/llmvet` from the squashfs, and creates the
+GitHub Release with:
+
+- `llmvet_<version>_<arch>.snap` — the published snap, per architecture
+- `llmvet_<version>_<arch>` — the executable extracted from that snap
+- `SHA256SUMS` — checksums over every attached file
+
+The release targets `amd64` and `arm64`; both must be published at the target
+version or the release fails rather than shipping a partial set. (The snap also
+builds `ppc64el` and `s390x`, but those are not currently included — adjust
+`--arches` in `.github/workflows/release.yml` to change the set.) Because the
+store build is asynchronous, the workflow polls for up to ~40 minutes for both
+architectures to appear. If a tag is pushed before the snap is ready — or a
+build lags past the timeout — re-run the workflow manually (Actions → release →
+Run workflow) once the builds have landed; it will attach the assets to the
+existing release.
+
+The released executables are byte-identical to what Snap Store users get —
+they are extracted from the published snaps, not rebuilt.

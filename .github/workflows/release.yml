@@ -1,0 +1,108 @@
+name: release
+
+# Publish a GitHub Release with the snaps and per-architecture executables.
+#
+# The binaries are NOT rebuilt here. The snap is built on Launchpad and
+# published to the Snap Store for every architecture; this workflow downloads
+# those exact snaps, verifies them, extracts bin/llmvet from each, and attaches
+# everything to the release. That keeps the released executables bit-identical
+# to what store users get.
+#
+# Trigger by pushing a semver tag (e.g. `v0.2.0`), or run manually from the
+# Actions tab (workflow_dispatch) once the store build for that tag is ready.
+#
+# Timing: pushing the tag also mirrors to Launchpad (see lp-git-mirror.yml),
+# which then builds and publishes the snap asynchronously. This job polls the
+# store for up to --timeout seconds waiting for the matching version to appear.
+
+on:
+    push:
+        tags:
+            - "v*"
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: "Existing tag to release (e.g. v0.2.0)"
+                required: true
+
+permissions:
+    contents: write
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Resolve tag
+              id: tag
+              run: |
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    echo "ref=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "ref=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  ref: ${{ steps.tag.outputs.ref }}
+                  # Full history is required to count commits for the version string.
+                  fetch-depth: 0
+
+            - name: Compute snap version
+              id: version
+              run: |
+                  set -euo pipefail
+                  tag="${{ steps.tag.outputs.ref }}"
+                  # Recompute the version string exactly as snap/snapcraft.yaml does.
+                  base_version="$(sed -n 's/^var Version = "\(.*\)"/\1/p' cmd/llmvet/main.go)"
+                  commit_index="$(git rev-list --count HEAD)"
+                  short_hash="$(git rev-parse --short HEAD)"
+                  version="${base_version}-${commit_index}-g${short_hash}"
+
+                  # Sanity: the tag must match the source version (tag `v0.2.0` -> `0.2.0`).
+                  if [ "${tag#v}" != "$base_version" ]; then
+                    echo "::error::tag ${tag} does not match main.go version ${base_version}" \
+                      "(bump 'var Version' or fix the tag)"
+                    exit 1
+                  fi
+
+                  echo "version=${version}" >> "$GITHUB_OUTPUT"
+                  echo "Releasing snap version ${version} for tag ${tag}"
+
+            - name: Install squashfs-tools
+              run: sudo apt-get update && sudo apt-get install -y squashfs-tools
+
+            - name: Fetch snaps and extract binaries
+              id: fetch
+              run: |
+                  python3 scripts/release-artifacts.py \
+                    --snap-name llmvet \
+                    --version "${{ steps.version.outputs.version }}" \
+                    --out-dir dist \
+                    --arches amd64,arm64 \
+                    --timeout 2400 \
+                    --interval 30
+
+            - name: Create GitHub Release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  set -euo pipefail
+                  tag="${{ steps.tag.outputs.ref }}"
+                  notes=".release-notes.md"
+                  {
+                    echo "Snaps and per-architecture executables extracted from the"
+                    echo "published Snap Store build \`${{ steps.version.outputs.version }}\`"
+                    echo "(architectures: ${{ steps.fetch.outputs.arches }})."
+                    echo
+                    echo "\`SHA256SUMS\` covers every attached file."
+                  } > "$notes"
+
+                  if gh release view "$tag" >/dev/null 2>&1; then
+                    gh release upload "$tag" dist/* --clobber
+                  else
+                    gh release create "$tag" dist/* \
+                      --draft \
+                      --title "$tag" \
+                      --notes-file "$notes" \
+                      --generate-notes
+                  fi
