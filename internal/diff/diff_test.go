@@ -198,6 +198,26 @@ func TestParse(t *testing.T) {
 				}},
 			}},
 		},
+		{
+			name:    "hunk header carries section heading",
+			fixture: "section_heading.diff",
+			want: []File{{
+				Path: "main.go", OldPath: "main.go", Status: StatusModified,
+				Hunks: []Hunk{{
+					OldStart: 23, OldLines: 6,
+					NewStart: 23, NewLines: 7,
+					Section: "func main() {",
+					Lines: []Line{
+						{Type: "context", Old: ip(23), New: ip(23), Content: "\ta := 1"},
+						{Type: "context", Old: ip(24), New: ip(24), Content: "\tb := 2"},
+						{Type: "context", Old: ip(25), New: ip(25), Content: "\tc := 3"},
+						{Type: "insert", New: ip(26), Content: "\td := 4"},
+						{Type: "context", Old: ip(26), New: ip(27), Content: "\te := 5"},
+						{Type: "context", Old: ip(27), New: ip(28), Content: "\tf := 6"},
+					},
+				}},
+			}},
+		},
 	}
 
 	for _, tc := range cases {

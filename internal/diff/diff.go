@@ -11,8 +11,8 @@ import (
 
 // Diff is the top-level response shape returned by /api/diff.
 type Diff struct {
-	Staged    bool   `json:"staged"`
-	Files     []File `json:"files"`
+	Staged    bool     `json:"staged"`
+	Files     []File   `json:"files"`
 	Untracked []string `json:"untracked,omitempty"`
 }
 
@@ -31,6 +31,7 @@ type Hunk struct {
 	OldLines int    `json:"old_lines"`
 	NewStart int    `json:"new_start"`
 	NewLines int    `json:"new_lines"`
+	Section  string `json:"section,omitempty"`
 	Lines    []Line `json:"lines"`
 }
 
@@ -52,7 +53,7 @@ const (
 	StatusCopied   = "copied"
 )
 
-var hunkHeaderRE = regexp.MustCompile(`^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@`)
+var hunkHeaderRE = regexp.MustCompile(`^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(?: (.*))?$`)
 
 // Parse parses the textual output of `git diff --no-color` into a slice of
 // File entries. An empty input yields an empty (non-nil) slice.
@@ -203,6 +204,7 @@ func parseHunk(lines []string) (Hunk, int, error) {
 	if m[4] != "" {
 		h.NewLines, _ = strconv.Atoi(m[4])
 	}
+	h.Section = m[5]
 
 	oldNo, newNo := h.OldStart, h.NewStart
 	i := 1

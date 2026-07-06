@@ -1,0 +1,11 @@
+diff --git a/main.go b/main.go
+index 1234567..89abcde 100644
+--- a/main.go
++++ b/main.go
+@@ -23,6 +23,7 @@ func main() {
+ 	a := 1
+ 	b := 2
+ 	c := 3
++	d := 4
+ 	e := 5
+ 	f := 6
