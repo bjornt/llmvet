@@ -1,5 +1,5 @@
 /**
- * llmvet Extension for pi
+ * llmvet Extension for oh-my-pi
  *
  * Registers /llmvet command and llmvet tool. Runs the llmvet binary,
  * shows the review URL from stderr, waits for the human reviewer, and
@@ -9,15 +9,15 @@
  * - Reviewer approves → approval message sent
  * - Reviewer aborts → abort message sent
  *
- * The process/spawn and outcome-mapping logic is shared with the oh-my-pi
+ * The process/spawn and outcome-mapping logic is shared with the pi
  * extension via ../llmvet-core.ts. This wrapper only supplies the
- * pi-specific bits: the @earendil-works import scope, the typebox parameter
- * schema, and the pi-only tool-result `terminate` flag and
- * promptSnippet/promptGuidelines fields.
+ * oh-my-pi-specific bits: the @oh-my-pi import scope, the canonical zod
+ * parameter schema (via pi.zod), and omits the pi-only tool-result
+ * `terminate` flag (oh-my-pi's AgentToolResult has no such field — the
+ * agent continues the turn and acts on the returned review comments).
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { Type } from "typebox";
+import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
 import {
 	LLMVET_TOOL_DESCRIPTION,
 	llmvetCommandAction,
@@ -25,13 +25,9 @@ import {
 	runReview,
 } from "../llmvet-core";
 
-// pi-only tool metadata fields (oh-my-pi's ToolDefinition has neither).
-const LLMVET_PROMPT_SNIPPET = "Run a human-in-the-loop code review via llmvet";
-const LLMVET_PROMPT_GUIDELINES = [
-	"Use llmvet when the user asks to review changes, run a code review, or requests human-in-the-loop review.",
-];
-
 export default function (pi: ExtensionAPI) {
+	const { z } = pi.zod;
+
 	// /llmvet command — user-triggered review
 	pi.registerCommand("llmvet", {
 		description: "Start a code review with llmvet",
@@ -50,13 +46,11 @@ export default function (pi: ExtensionAPI) {
 		name: "llmvet",
 		label: "Code Review",
 		description: LLMVET_TOOL_DESCRIPTION,
-		promptSnippet: LLMVET_PROMPT_SNIPPET,
-		promptGuidelines: LLMVET_PROMPT_GUIDELINES,
-		parameters: Type.Object({}),
+		parameters: z.object({}),
 		async execute(_toolCallId, _params, _signal, _onUpdate, ctx) {
 			const outcome = await runReview(ctx);
 			if (outcome.kind === "error") throw new Error(outcome.message);
-			return llmvetToolResult(outcome, { terminate: true });
+			return llmvetToolResult(outcome, { terminate: false });
 		},
 	});
 }

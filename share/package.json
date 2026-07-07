@@ -1,0 +1,12 @@
+{
+  "name": "llmvet-extensions-build",
+  "private": true,
+  "description": "Builds auto-discoverable llmvet extension packages for pi and oh-my-pi from the shared source in share/.",
+  "type": "module",
+  "scripts": {
+    "build": "node build-extensions.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

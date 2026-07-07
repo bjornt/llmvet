@@ -40,6 +40,10 @@ parts:
       version="${base_version}-${commit_index}-g${short_hash}"
       craftctl set version="${version}"
       make build LDFLAGS="-X main.Version=${version}"
+      make extensions
       install -D -m755 bin/llmvet "${SNAPCRAFT_PART_INSTALL}/bin/llmvet"
       mkdir -p "${SNAPCRAFT_PART_INSTALL}/share/agent-skills"
       cp -r share/agent-skills/llmvet "${SNAPCRAFT_PART_INSTALL}/share/agent-skills/"
+      mkdir -p "${SNAPCRAFT_PART_INSTALL}/share/extensions"
+      cp -r share/dist/extensions/oh-my-pi/llmvet "${SNAPCRAFT_PART_INSTALL}/share/extensions/oh-my-pi-llmvet"
+      cp -r share/dist/extensions/pi/llmvet "${SNAPCRAFT_PART_INSTALL}/share/extensions/pi-llmvet"

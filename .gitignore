@@ -9,6 +9,12 @@
 # Run `make web` before `go build` so //go:embed has files to embed.
 /internal/assets/dist/
 
+# Extension build output and build-tool deps. `make extensions` produces the
+# packaged extension dirs under share/dist; nothing in share/dist or
+# share/node_modules is checked in.
+/share/node_modules/
+/share/dist/
+
 # snapcraft
 /parts/
 /stage/
