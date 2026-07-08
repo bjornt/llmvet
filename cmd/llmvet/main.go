@@ -31,7 +31,8 @@ func main() {
 		return
 	}
 
-	port := flag.Int("port", 0, "TCP port to bind on 127.0.0.1 (0 = random free port)")
+	port := flag.Int("port", 0, "TCP port to bind (0 = random free port)")
+	host := flag.String("host", envDefault("LLMVET_HOST", "127.0.0.1"), "IP address to bind (env: LLMVET_HOST)")
 	noOpen := flag.Bool("no-open", false, "do not open the browser automatically")
 	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
@@ -41,12 +42,12 @@ func main() {
 		return
 	}
 
-	os.Exit(run(*port, *noOpen))
+	os.Exit(run(*host, *port, *noOpen))
 }
 
-func run(port int, noOpen bool) int {
+func run(host string, port int, noOpen bool) int {
 	srv := server.New(diff.Run, assets.FS())
-	addr := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
+	addr := net.JoinHostPort(host, strconv.Itoa(port))
 	if err := srv.Listen(addr); err != nil {
 		fmt.Fprintf(os.Stderr, "llmvet: bind %s: %v\n", addr, err)
 		return 1
@@ -72,4 +73,11 @@ func run(port int, noOpen bool) int {
 		fmt.Fprintln(os.Stderr, "review aborted")
 		return 130
 	}
+}
+
+func envDefault(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }
