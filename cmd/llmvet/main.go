@@ -17,7 +17,7 @@ import (
 	"llmvet/internal/server"
 )
 
-var Version = "0.3.0"
+var Version = "0.4.0"
 
 func main() {
 	// Subcommand: llmvet mcp — run as MCP stdio server
