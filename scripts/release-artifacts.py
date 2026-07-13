@@ -255,6 +255,9 @@ def main() -> int:
     if not builds:
         raise SystemExit(f"no builds found for version {args.version}")
 
+    # Download-friendly names: snap arch → release filename suffix.
+    ARCH_DISPLAY = {"amd64": "x86", "arm64": "arm64"}
+
     binary_name = os.path.basename(args.binary)
     produced: list[str] = []
     for arch in sorted(builds):
@@ -287,7 +290,7 @@ def main() -> int:
             time.sleep(2 * attempt)
         log(f"[{arch}] sha3-384 verified")
 
-        bin_out = os.path.join(args.out_dir, f"{args.snap_name}_{args.version}_{arch}")
+        bin_out = os.path.join(args.out_dir, f"{binary_name}-linux-{ARCH_DISPLAY.get(arch, arch)}")
         extract_binary(snap_path, args.binary, bin_out)
         log(f"[{arch}] extracted {binary_name} -> {os.path.basename(bin_out)}")
 
